@@ -41,4 +41,16 @@ class AuthController extends Controller
             'token' => $user->createToken(self::TOKEN_NAME)->plainTextToken
         ]);
     }
+
+    public function logout(): JsonResponse
+    {
+        /** @var User $user */
+        $user = auth()->user();
+        $user->tokens()->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Logout'
+        ]);
+    }
 }

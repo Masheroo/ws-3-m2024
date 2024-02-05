@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddFilesRequest;
+use App\Http\Requests\RenameFileRequest;
 use App\Http\Service\Helper\FileHelper;
 use App\Models\File;
 use App\Models\User;
@@ -41,5 +42,21 @@ class FileController extends Controller
             }
         }
         return response()->json($response);
+    }
+
+    public function renameFile(RenameFileRequest $request): JsonResponse
+    {
+        /** @var File $file */
+        $file = File::where(['id' => $request->route('id')])->first();
+
+        Storage::move($file->filename, $request->name);
+
+        $file->filename = $request->name;
+        $file->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Renamed'
+        ]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddFilesRequest;
+use App\Http\Requests\DeleteFileRequest;
 use App\Http\Requests\RenameFileRequest;
 use App\Http\Service\Helper\FileHelper;
 use App\Models\File;
@@ -57,6 +58,21 @@ class FileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Renamed'
+        ]);
+    }
+
+    public function deleteFile(DeleteFileRequest $request): JsonResponse
+    {
+        /** @var File $file */
+        $file = File::where(['id' => $request->route('id')])->first();
+
+        Storage::delete($file->filename);
+
+        $file->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'File already deleted'
         ]);
     }
 }

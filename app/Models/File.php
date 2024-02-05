@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
-use Psy\Util\Str;
 
 class File extends Model
 {
     use HasFactory;
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
 
     protected $fillable = [
         'id',
@@ -26,10 +29,10 @@ class File extends Model
         $instance = new self();
         $instance->id = self::createUniqueId();
 
-        return new self();
+        return $instance;
     }
 
-    private static function createUniqueId(): string
+    public static function createUniqueId(): string
     {
         $id = \Illuminate\Support\Str::random(10);
         $validator = Validator::make(['id' => $id], ['id' => 'unique:files,id']);
@@ -39,10 +42,5 @@ class File extends Model
         }
 
         return $id;
-    }
-
-    private function __construct(array $attributes = [])
-    {
-        parent::__construct($attributes);
     }
 }

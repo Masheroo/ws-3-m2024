@@ -21,3 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('registration', [\App\Http\Controllers\AuthController::class, 'registration']);
 Route::post('login', [\App\Http\Controllers\AuthController::class, 'login']);
 Route::get('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/files', [\App\Http\Controllers\FileController::class, 'addFiles']);
+});

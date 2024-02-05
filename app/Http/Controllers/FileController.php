@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AddFilesRequest;
 use App\Http\Requests\DeleteFileRequest;
+use App\Http\Requests\GetFileRequest;
 use App\Http\Requests\RenameFileRequest;
 use App\Http\Service\Helper\FileHelper;
 use App\Models\File;
@@ -11,6 +12,7 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FileController extends Controller
 {
@@ -74,5 +76,12 @@ class FileController extends Controller
             'success' => true,
             'message' => 'File already deleted'
         ]);
+    }
+
+    public function getFile(GetFileRequest $request): StreamedResponse
+    {
+        $file = File::where(['id' => $request->route('id')])->first();
+
+        return Storage::download($file->filename);
     }
 }

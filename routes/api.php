@@ -26,4 +26,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/files', [\App\Http\Controllers\FileController::class, 'addFiles']);
     Route::patch('/files/{id}', [\App\Http\Controllers\FileController::class, 'renameFile']);
     Route::delete('/files/{id}', [\App\Http\Controllers\FileController::class, 'deleteFile']);
+    Route::get('/files/{id}', [\App\Http\Controllers\FileController::class, 'getFile']);
 });

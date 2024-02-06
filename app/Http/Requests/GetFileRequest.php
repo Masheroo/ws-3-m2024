@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use App\Models\AccessRight;
 use App\Models\File;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class GetFileRequest extends ApiFormRequest
@@ -27,7 +29,7 @@ class GetFileRequest extends ApiFormRequest
                 return true;
             }
         }
-        return false;
+        throw new AccessDeniedException('1111');
     }
 
     /**

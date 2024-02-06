@@ -2,8 +2,12 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Validation\UnauthorizedException;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -24,10 +28,22 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
+        $this->renderable(function (AccessDeniedException $exception){
+            return response()->json([
+                'message' => 'Forbidden for you'
+            ], 403);
+        });
         $this->renderable(function (UnauthorizedException $exception){
            return response()->json([
                'message' => 'Login failed.'
            ], 403);
         });
+
+        $this->renderable(function (NotFoundHttpException $exception){
+            return response()->json([
+                'message' => 'Not found'
+            ], 404);
+        });
+
     }
 }

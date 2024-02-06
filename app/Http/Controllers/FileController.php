@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\AddAccessRightsRequest;
+use App\Http\Requests\AccessRightsRequest;
 use App\Http\Requests\AddFilesRequest;
 use App\Http\Requests\DeleteFileRequest;
 use App\Http\Requests\GetFileRequest;
@@ -87,7 +87,7 @@ class FileController extends Controller
         return Storage::download($file->filename);
     }
 
-    public function addAccessRights(AddAccessRightsRequest $request): JsonResponse
+    public function addAccessRights(AccessRightsRequest $request): JsonResponse
     {
         $accessRight = new AccessRight();
         $accessRight->file_id = $request->route('id');
@@ -107,6 +107,35 @@ class FileController extends Controller
               'fullname' => $user->first_name . ' ' . $user->last_name,
               'email' => $user->email,
               'type' => AccessRight::RIGHT_NAME
+            ];
+        }
+        /** @var User $user */
+        $user = auth()->user();
+
+        $response[] = [
+            'fullname' => $user->first_name . ' ' . $user->last_name,
+            'email' => $user->email,
+            'type' => 'author'
+        ];
+
+        return response()->json($response);
+    }
+
+    public function deleteAccessRights(AccessRightsRequest $request): JsonResponse
+    {
+        $userForDeleteRights = User::where(['email' => $request->email])->first();
+        AccessRight::where(['user_id' => $userForDeleteRights->id, 'file_id' => $request->route('id')])->delete();
+
+        $allAccessRightToFile = AccessRight::where(['file_id' => $request->route('id')])->get();
+        $response = [];
+
+        foreach ($allAccessRightToFile as $accessRight){
+            $user = User::find($accessRight->user_id);
+
+            $response[] = [
+                'fullname' => $user->first_name . ' ' . $user->last_name,
+                'email' => $user->email,
+                'type' => AccessRight::RIGHT_NAME
             ];
         }
         /** @var User $user */

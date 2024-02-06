@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class AddAccessRightsRequest extends ApiFormRequest
+class AccessRightsRequest extends ApiFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

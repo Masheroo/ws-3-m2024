@@ -2,10 +2,9 @@
 
 namespace App\Http\Service\Helper;
 
-use Illuminate\Support\Facades\Validator;
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-use function Symfony\Component\String\b;
 
 class FileHelper
 {
@@ -14,13 +13,13 @@ class FileHelper
         return pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
     }
 
-    public static function getUniqueClientFilenameFromUploadedFile(UploadedFile $uploadedFile): string
+    public static function getUniqueClientFilenameFromUploadedFile(UploadedFile $uploadedFile, User $user): string
     {
         $filename = self::getClientFileNameWithoutExtension($uploadedFile);
-        if (!self::checkFilenameUnique($filename . '.' . $uploadedFile->getClientOriginalExtension())) {
+        if (!self::checkFilenameUnique($filename . '.' . $uploadedFile->getClientOriginalExtension(), $user)) {
             for ($i = 1; $i > -1; $i++) {
                 $newFilename = $filename . '(' . $i . ')';
-                if (self::checkFilenameUnique($newFilename. '.' . $uploadedFile->getClientOriginalExtension())){
+                if (self::checkFilenameUnique($newFilename. '.' . $uploadedFile->getClientOriginalExtension(), $user)){
                     $filename = $newFilename;
                     break;
                 }
@@ -29,12 +28,8 @@ class FileHelper
         return $filename . '.' . $uploadedFile->getClientOriginalExtension();
     }
 
-    public static function checkFilenameUnique(string $filename): bool
+    public static function checkFilenameUnique(string $filename, User $user): bool
     {
-        $validator = Validator::make(['filename' => $filename], [
-            'filename' => 'unique:files,filename'
-        ]);
-
-        return !$validator->fails();
+        return !Storage::exists('/' . $user->id . '/'.$filename);
     }
 }

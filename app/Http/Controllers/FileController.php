@@ -28,8 +28,8 @@ class FileController extends Controller
         foreach ($files as $uploadedFile) {
             $file = File::new();
             $file->user_id = $user->id;
-            $file->filename = FileHelper::getUniqueClientFilenameFromUploadedFile($uploadedFile);
-            if (Storage::put($file->filename, $uploadedFile->getContent())) {
+            $file->filename = FileHelper::getUniqueClientFilenameFromUploadedFile($uploadedFile, $user);
+            if (Storage::put('/' . $user->id . '/'.$file->filename, $uploadedFile->getContent())) {
                 $response[] = [
                     'success' => true,
                     'message' => 'Success',
@@ -54,7 +54,7 @@ class FileController extends Controller
         /** @var File $file */
         $file = File::where(['id' => $request->route('id')])->first();
 
-        Storage::move($file->filename, $request->name);
+        Storage::move('/' . $file->user_id . '/' . $file->filename, '/' . $file->user_id . '/' . $request->name);
 
         $file->filename = $request->name;
         $file->save();
@@ -70,7 +70,7 @@ class FileController extends Controller
         /** @var File $file */
         $file = File::where(['id' => $request->route('id')])->first();
 
-        Storage::delete($file->filename);
+        Storage::delete('/' . $file->user_id . '/' . $file->filename);
 
         $file->delete();
 
@@ -84,7 +84,7 @@ class FileController extends Controller
     {
         $file = File::where(['id' => $request->route('id')])->first();
 
-        return Storage::download($file->filename);
+        return Storage::download('/' . $file->user_id . '/' . $file->filename);
     }
 
     public function addAccessRights(AccessRightsRequest $request): JsonResponse

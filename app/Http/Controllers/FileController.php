@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AddAccessRightsRequest;
 use App\Http\Requests\AddFilesRequest;
 use App\Http\Requests\DeleteFileRequest;
 use App\Http\Requests\GetFileRequest;
 use App\Http\Requests\RenameFileRequest;
 use App\Http\Service\Helper\FileHelper;
+use App\Models\AccessRight;
 use App\Models\File;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -83,5 +85,39 @@ class FileController extends Controller
         $file = File::where(['id' => $request->route('id')])->first();
 
         return Storage::download($file->filename);
+    }
+
+    public function addAccessRights(AddAccessRightsRequest $request): JsonResponse
+    {
+        $accessRight = new AccessRight();
+        $accessRight->file_id = $request->route('id');
+
+        $user = User::where(['email' => $request->email])->first();
+        $accessRight->user_id = $user->id;
+
+        $accessRight->save();
+
+        $allAccessRightToFile = AccessRight::where(['file_id' => $request->route('id')])->get();
+        $response = [];
+
+        foreach ($allAccessRightToFile as $accessRight){
+            $user = User::find($accessRight->user_id);
+
+            $response[] = [
+              'fullname' => $user->first_name . ' ' . $user->last_name,
+              'email' => $user->email,
+              'type' => AccessRight::RIGHT_NAME
+            ];
+        }
+        /** @var User $user */
+        $user = auth()->user();
+
+        $response[] = [
+            'fullname' => $user->first_name . ' ' . $user->last_name,
+            'email' => $user->email,
+            'type' => 'author'
+        ];
+
+        return response()->json($response);
     }
 }

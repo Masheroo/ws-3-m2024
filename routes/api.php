@@ -27,4 +27,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/files/{id}', [\App\Http\Controllers\FileController::class, 'renameFile']);
     Route::delete('/files/{id}', [\App\Http\Controllers\FileController::class, 'deleteFile']);
     Route::get('/files/{id}', [\App\Http\Controllers\FileController::class, 'getFile']);
+
+    Route::post('/files/{id}/accesses', [\App\Http\Controllers\FileController::class, 'addAccessRights']);
 });

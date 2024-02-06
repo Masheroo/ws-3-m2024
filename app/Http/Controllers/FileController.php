@@ -100,13 +100,13 @@ class FileController extends Controller
         $allAccessRightToFile = AccessRight::where(['file_id' => $request->route('id')])->get();
         $response = [];
 
-        foreach ($allAccessRightToFile as $accessRight){
+        foreach ($allAccessRightToFile as $accessRight) {
             $user = User::find($accessRight->user_id);
 
             $response[] = [
-              'fullname' => $user->first_name . ' ' . $user->last_name,
-              'email' => $user->email,
-              'type' => AccessRight::RIGHT_NAME
+                'fullname' => $user->first_name . ' ' . $user->last_name,
+                'email' => $user->email,
+                'type' => AccessRight::RIGHT_NAME
             ];
         }
         /** @var User $user */
@@ -129,7 +129,7 @@ class FileController extends Controller
         $allAccessRightToFile = AccessRight::where(['file_id' => $request->route('id')])->get();
         $response = [];
 
-        foreach ($allAccessRightToFile as $accessRight){
+        foreach ($allAccessRightToFile as $accessRight) {
             $user = User::find($accessRight->user_id);
 
             $response[] = [
@@ -146,6 +146,44 @@ class FileController extends Controller
             'email' => $user->email,
             'type' => 'author'
         ];
+
+        return response()->json($response);
+    }
+
+    public function getUserFiles(): JsonResponse
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        $files = File::where(['user_id' => $user->id])->get();
+
+        $response = [];
+
+        foreach ($files as $i => $file) {
+            $response[$i] = [
+                'file_id' => $file->id,
+                'name' => $file->name,
+                'url' => env('APP_URL') . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $file->id,
+                'accesses' => [
+                ]
+            ];
+
+            $accesses = AccessRight::where(['file_id' => $file->id])->get();
+            foreach ($accesses as $access){
+                $accessRightUser = User::find($access->user_id);
+
+                $response[$i]['accesses'][] = [
+                    'fullname' => $accessRightUser->first_name . ' ' . $accessRightUser->last_name,
+                    'email' => $accessRightUser->email,
+                    'type' => AccessRight::RIGHT_NAME
+                ];
+            }
+            $response[$i]['accesses'][] = [
+                'fullname' => $user->first_name . ' ' . $user->last_name,
+                'email' => $user->email,
+                'type' => 'author'
+            ];
+        }
 
         return response()->json($response);
     }

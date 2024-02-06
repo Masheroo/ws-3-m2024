@@ -24,6 +24,7 @@ Route::get('logout', [\App\Http\Controllers\AuthController::class, 'logout'])->m
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/files/disk', [\App\Http\Controllers\FileController::class, 'getUserFiles']);
+    Route::get('/shared', [\App\Http\Controllers\FileController::class, 'getFilesWhereUserHaveAccess']);
 
     Route::post('/files', [\App\Http\Controllers\FileController::class, 'addFiles']);
     Route::patch('/files/{id}', [\App\Http\Controllers\FileController::class, 'renameFile']);

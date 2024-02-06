@@ -162,14 +162,14 @@ class FileController extends Controller
         foreach ($files as $i => $file) {
             $response[$i] = [
                 'file_id' => $file->id,
-                'name' => $file->name,
+                'name' => $file->filename,
                 'url' => env('APP_URL') . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $file->id,
                 'accesses' => [
                 ]
             ];
 
             $accesses = AccessRight::where(['file_id' => $file->id])->get();
-            foreach ($accesses as $access){
+            foreach ($accesses as $access) {
                 $accessRightUser = User::find($access->user_id);
 
                 $response[$i]['accesses'][] = [
@@ -182,6 +182,25 @@ class FileController extends Controller
                 'fullname' => $user->first_name . ' ' . $user->last_name,
                 'email' => $user->email,
                 'type' => 'author'
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function getFilesWhereUserHaveAccess(): JsonResponse
+    {
+        $user = auth()->user();
+
+        $accesses = AccessRight::where(['user_id' => $user->id])->get();
+        $response = [];
+
+        foreach ($accesses as $access) {
+            $file = File::where(['id' =>$access->file_id])->first();
+            $response[] = [
+                'file_id' => $file->id,
+                'name' => $file->filename,
+                'url' => env('APP_URL') . DIRECTORY_SEPARATOR . 'files' . DIRECTORY_SEPARATOR . $file->id,
             ];
         }
 

@@ -29,7 +29,7 @@ class AuthController extends Controller
         /** @var User $user */
         $user = User::where('email', $request->get('email'))->first();
 
-        if (!$user && Hash::check($request->get('password'), $user->password)) {
+        if (!$user || !Hash::check($request->get('password'), $user->password)) {
             throw new UnauthorizedException();
         }
 

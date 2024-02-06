@@ -2,12 +2,12 @@
 
 namespace App\Http\Requests;
 
-use App\Models\AccessRight;
 use App\Models\File;
 use App\Models\User;
+use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class GetFileRequest extends ApiFormRequest
+class AccessRightsRequest extends ApiFormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,15 +19,7 @@ class GetFileRequest extends ApiFormRequest
         /** @var User $user */
         $user = $this->user();
 
-        if ($user->id == $file->user_id) {
-            return true;
-        } else {
-            $accessRight = AccessRight::where(['file_id' => $file->id, 'user_id' => $user->id])->first();
-            if ($accessRight){
-                return true;
-            }
-        }
-        return false;
+        return $user->id == $file->user_id;
     }
 
     /**
@@ -37,6 +29,8 @@ class GetFileRequest extends ApiFormRequest
      */
     public function rules(): array
     {
-        return [];
+        return [
+            'email' => 'required|email|exists:App\Models\User,email'
+        ];
     }
 }
